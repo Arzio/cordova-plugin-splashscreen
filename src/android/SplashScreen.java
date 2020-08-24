@@ -127,7 +127,7 @@ public class SplashScreen extends CordovaPlugin {
 
     private int getFadeDuration () {
         int fadeSplashScreenDuration = preferences.getBoolean("FadeSplashScreen", true) ?
-            preferences.getInteger("FadeSplashScreenDuration", DEFAULT_FADE_DURATION) : 0;
+                preferences.getInteger("FadeSplashScreenDuration", DEFAULT_FADE_DURATION) : 0;
 
         if (fadeSplashScreenDuration < 30) {
             // [CB-9750] This value used to be in decimal seconds, so we will assume that if someone specifies 10
@@ -160,20 +160,37 @@ public class SplashScreen extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-        if (action.equals("hide")) {
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    webView.postMessage("splashscreen", "hide");
-                }
-            });
-        } else if (action.equals("show")) {
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    webView.postMessage("splashscreen", "show");
-                }
-            });
-        } else {
-            return false;
+        switch (action) {
+            case "hide":
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        webView.postMessage("splashscreen", "hide");
+                    }
+                });
+                break;
+            case "show":
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        webView.postMessage("splashscreen", "show");
+                    }
+                });
+                break;
+            case "hideSpinner":
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        webView.postMessage("spinner", "stop");
+                    }
+                });
+                break;
+            case "showSpinner":
+                cordova.getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        webView.postMessage("spinner", "start");
+                    }
+                });
+                break;
+            default:
+                return false;
         }
 
         callbackContext.success();
@@ -185,18 +202,25 @@ public class SplashScreen extends CordovaPlugin {
         if (HAS_BUILT_IN_SPLASH_SCREEN) {
             return null;
         }
-        if ("splashscreen".equals(id)) {
-            if ("hide".equals(data.toString())) {
-                this.removeSplashScreen(false);
-            } else {
-                this.showSplashScreen(false);
-            }
-        } else if ("spinner".equals(id)) {
-            if ("stop".equals(data.toString())) {
-                getView().setVisibility(View.VISIBLE);
-            }
-        } else if ("onReceivedError".equals(id)) {
-            this.spinnerStop();
+        String command = data.toString();
+        switch (id) {
+            case "splashscreen":
+                if ("hide".equals(command)) {
+                    this.removeSplashScreen(false);
+                } else if ("show".equals(command)) {
+                    this.showSplashScreen(false);
+                }
+                break;
+            case "spinner":
+                if ("stop".equals(command)) {
+                    getView().setVisibility(View.VISIBLE);
+                } else if ("start".equals(command)) {
+                    this.spinnerStart();
+                }
+                break;
+            case "onReceivedError":
+                this.spinnerStop();
+                break;
         }
         return null;
     }
@@ -219,7 +243,7 @@ public class SplashScreen extends CordovaPlugin {
     private void removeSplashScreen(final boolean forceHideImmediately) {
         cordova.getActivity().runOnUiThread(new Runnable() {
             public void run() {
-        if (splashDialog != null && splashImageView != null && splashDialog.isShowing()) {//check for non-null splashImageView, see https://issues.apache.org/jira/browse/CB-12277
+                if (splashDialog != null && splashImageView != null && splashDialog.isShowing()) {//check for non-null splashImageView, see https://issues.apache.org/jira/browse/CB-12277
                     final int fadeSplashScreenDuration = getFadeDuration();
                     // CB-10692 If the plugin is being paused/destroyed, skip the fading and hide it immediately
                     if (fadeSplashScreenDuration > 0 && forceHideImmediately == false) {
@@ -372,17 +396,17 @@ public class SplashScreen extends CordovaPlugin {
                     String colorName = preferences.getString("SplashScreenSpinnerColor", null);
                     if(colorName != null){
                         int[][] states = new int[][] {
-                            new int[] { android.R.attr.state_enabled}, // enabled
-                            new int[] {-android.R.attr.state_enabled}, // disabled
-                            new int[] {-android.R.attr.state_checked}, // unchecked
-                            new int[] { android.R.attr.state_pressed}  // pressed
+                                new int[] { android.R.attr.state_enabled}, // enabled
+                                new int[] {-android.R.attr.state_enabled}, // disabled
+                                new int[] {-android.R.attr.state_checked}, // unchecked
+                                new int[] { android.R.attr.state_pressed}  // pressed
                         };
                         int progressBarColor = Color.parseColor(colorName);
                         int[] colors = new int[] {
-                            progressBarColor,
-                            progressBarColor,
-                            progressBarColor,
-                            progressBarColor
+                                progressBarColor,
+                                progressBarColor,
+                                progressBarColor,
+                                progressBarColor
                         };
                         ColorStateList colorStateList = new ColorStateList(states, colors);
                         progressBar.setIndeterminateTintList(colorStateList);
