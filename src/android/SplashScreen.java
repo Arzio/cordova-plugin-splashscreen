@@ -387,11 +387,8 @@ public class SplashScreen extends CordovaPlugin {
 
                 RelativeLayout centeredLayout = new RelativeLayout(cordova.getActivity());
                 centeredLayout.setGravity(Gravity.CENTER_HORIZONTAL);
-
-                RelativeLayout.LayoutParams centeredLayoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-                centeredLayoutParams.setMargins(0, 0, 0, 25);
-
-                centeredLayout.setLayoutParams(centeredLayoutParams);
+                centeredLayout.setPadding(0, 0, 0, 25);
+                centeredLayout.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
 
                 ProgressBar progressBar = new ProgressBar(webView.getContext());
                 RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
