@@ -213,6 +213,8 @@ public class SplashScreen extends CordovaPlugin {
                 break;
             case "spinner":
                 if ("stop".equals(command)) {
+                    this.getView().setVisibility(View.VISIBLE);
+					
                     this.spinnerStop();
                 } else if ("start".equals(command)) {
                     this.spinnerStart();
@@ -430,8 +432,6 @@ public class SplashScreen extends CordovaPlugin {
                 if (spinnerDialog != null && spinnerDialog.isShowing()) {
                     spinnerDialog.dismiss();
                     spinnerDialog = null;
-
-                    SplashScreen.this.getView().setVisibility(View.VISIBLE);
                 }
             }
         });
